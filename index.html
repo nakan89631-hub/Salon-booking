@@ -276,16 +276,13 @@
 
   // ---------- 固定データ ----------
   var SERVICES = [
-    {id:'hari', name:'鍼治療', duration:60, price:5500},
-    {id:'kyu', name:'灸治療', duration:45, price:4500},
-    {id:'harikyu', name:'鍼灸治療(鍼+灸)', duration:75, price:8000},
-    {id:'kotsuban', name:'骨盤矯正', duration:30, price:4000},
-    {id:'sports', name:'スポーツ鍼', duration:50, price:6000}
+    {id:'hari', name:'スタンダード', duration:50, price:6500},
+    {id:'kyu', name:'プレミアム', duration:90, price:9000},
+    {id:'harikyu', name:'ポイント', duration:30, price:4500},
   ];
-  var STYLISTS = ['指名なし','中村先生','佐藤先生','鈴木先生'];
-  var CAPACITY = 3; // 同時対応可能な席数
+  var CAPACITY = 1; // 同時対応可能な席数
   var OPEN_MIN = 10*60;   // 10:00
-  var CLOSE_MIN = 19*60;  // 19:00
+  var CLOSE_MIN = 17*60;  // 19:00
   var SLOT_STEP = 30;
   var CLOSED_WEEKDAY = 1; // 月曜定休 (0=日,1=月,...)
   var DEMO_KEY = 'salon_ren_demo_reservations';
