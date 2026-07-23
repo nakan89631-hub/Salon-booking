@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>美容室 蓮 | ご予約</title>
+<title>鍼灸院node.OMIYA | ご予約</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
@@ -276,16 +276,14 @@
 
   // ---------- 固定データ ----------
   var SERVICES = [
-    {id:'cut', name:'カット', duration:60, price:4500},
-    {id:'color', name:'カラー', duration:90, price:7000},
-    {id:'perm', name:'パーマ', duration:120, price:9000},
-    {id:'treatment', name:'トリートメント', duration:45, price:3500},
-    {id:'cutcolor', name:'カット + カラー', duration:150, price:11000}
+    {id:'standard', name:'スタンダード　50分　￥6,500', duration:50, price:6,500},
+    {id:'color', name:'プレミアム　80分　￥9,000', duration:80, price:9,000},
+    {id:'perm', name:'ポイント　30分　￥4,500', duration:30, price:4,500},
   ];
-  var STYLISTS = ['指名なし','美咲','健太','ゆかり'];
-  var CAPACITY = 3; // 同時対応可能な席数
+  var STYLISTS = ['中西友紀'];
+  var CAPACITY = 1; // 同時対応可能な席数
   var OPEN_MIN = 10*60;   // 10:00
-  var CLOSE_MIN = 19*60;  // 19:00
+  var CLOSE_MIN = 19*60;  // 16:00
   var SLOT_STEP = 30;
   var CLOSED_WEEKDAY = 1; // 月曜定休 (0=日,1=月,...)
   var DEMO_KEY = 'salon_ren_demo_reservations';
