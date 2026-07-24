@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>美容室 蓮 | ご予約</title>
+<title>鍼灸院 node.OMIYA | ご予約</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
@@ -65,6 +65,16 @@
     background:#fff;
     padding:1px 6px;
     border-radius:4px;
+  }
+
+  .info-banner{
+    background:var(--sage-pale);
+    color:var(--sage-deep);
+    border-radius:8px;
+    padding:12px 16px;
+    font-size:12px;
+    margin-bottom:20px;
+    line-height:1.7;
   }
 
   /* ---- Stepper ---- */
@@ -253,7 +263,7 @@
 <div id="app">
   <header class="site">
     <div class="brand">
-      <div class="eyebrow serif">SALON REN — 美容室 蓮</div>
+      <div class="eyebrow serif">node.OMIYA — 鍼灸院</div>
       <h1 class="serif">ご予約</h1>
     </div>
   </header>
@@ -276,17 +286,14 @@
 
   // ---------- 固定データ ----------
   var SERVICES = [
-    {id:'cut', name:'カット', duration:60, price:4500},
-    {id:'color', name:'カラー', duration:90, price:7000},
-    {id:'perm', name:'パーマ', duration:120, price:9000},
-    {id:'treatment', name:'トリートメント', duration:45, price:3500},
-    {id:'cutcolor', name:'カット + カラー', duration:150, price:11000}
+    {id:'hari', name:'スタンダード', duration:50, price:6500},
+    {id:'kyu', name:'プレミアム', duration:90, price:9000},
+    {id:'harikyu', name:'ポイント', duration:30, price:4500}
   ];
-  var STYLISTS = ['指名なし','美咲','健太','ゆかり'];
-  var CAPACITY = 3; // 同時対応可能な席数
+  var CAPACITY = 1; // 同時対応可能な席数(1名体制)
   var OPEN_MIN = 10*60;   // 10:00
-  var CLOSE_MIN = 19*60;  // 19:00
-  var SLOT_STEP = 30;
+  var CLOSE_MIN = 17*60;  // 17:00
+  var SLOT_STEP = 60;
   var CLOSED_WEEKDAY = 1; // 月曜定休 (0=日,1=月,...)
   var DEMO_KEY = 'salon_ren_demo_reservations';
 
@@ -299,7 +306,6 @@
     service: null,
     date: '',
     time: null,
-    stylist: STYLISTS[0],
     name: '',
     phone: '',
     note: '',
@@ -385,6 +391,10 @@
     var h = Math.floor(min/60), m = min%60;
     return pad(h)+':'+pad(m);
   }
+  function hourLabel(min){
+    var h = Math.floor(min/60);
+    return pad(h)+'時台';
+  }
   function todayISO(){
     var d = new Date();
     return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
@@ -423,7 +433,7 @@
     for(var t=OPEN_MIN; t+duration<=CLOSE_MIN; t+=SLOT_STEP){
       if(isToday && t <= nowMin) continue;
       var used = overlapCount(bookingsOnDate, t, duration);
-      slots.push({ start:t, label:minToLabel(t), full: used>=CAPACITY });
+      slots.push({ start:t, label:hourLabel(t), full: used>=CAPACITY });
     }
     return slots;
   }
@@ -441,6 +451,7 @@
       return;
     }
     var html = '';
+    html += '<div class="info-banner">この予約フォームで送信いただいた内容は「予約希望」の受付です。内容を確認のうえ、こちらからの返信(お電話等)をもってご予約確定となります。ご希望の時間帯は目安であり、詳細なお時間は確定のご連絡時にご案内します。</div>';
     if(!usingGas()){
       html += '<div class="setup-banner">スプレッドシート連携が未設定のため、現在はデモモードで動作しています。'
         + 'このコードの <code>CONFIG.GAS_URL</code> にGoogle Apps ScriptのウェブアプリURLを設定すると、'
@@ -495,7 +506,7 @@
         h += '<div class="slot-loading">空き状況を確認中…</div>';
       }else{
         var slots = availableSlots(state.date, svc.duration, state.dateBookings);
-        h += '<div><label class="field-label">お時間('+svc.duration+'分)</label>';
+        h += '<div><label class="field-label">ご希望の時間帯(施術時間目安'+svc.duration+'分)</label>';
         if(slots.length===0){
           h += '<div class="empty-state">この日はご案内できる時間がありません。他の日をお選びください。</div>';
         }else{
@@ -506,12 +517,6 @@
           });
           h += '</div></div>';
         }
-        h += '<div><label class="field-label" for="stylistSelect">担当スタイリスト</label>';
-        h += '<select id="stylistSelect">';
-        STYLISTS.forEach(function(name){
-          h += '<option value="'+name+'" '+(state.stylist===name?'selected':'')+'>'+name+'</option>';
-        });
-        h += '</select></div>';
       }
     }
     h += '</div>';
@@ -531,8 +536,7 @@
     var svc = serviceById(state.service);
     h += '<div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--line);">';
     h += '<div class="summary-line"><span class="label">メニュー</span><span>'+svc.name+'</span></div>';
-    h += '<div class="summary-line"><span class="label">日時</span><span>'+formatDateJP(state.date)+' '+minToLabel(state.time)+'</span></div>';
-    h += '<div class="summary-line"><span class="label">担当</span><span>'+state.stylist+'</span></div>';
+    h += '<div class="summary-line"><span class="label">日時</span><span>'+formatDateJP(state.date)+' '+hourLabel(state.time)+'</span></div>';
     h += '<div class="summary-line"><span class="label">お会計目安</span><span>'+yen(svc.price)+'</span></div>';
     h += '</div>';
 
@@ -548,10 +552,9 @@
     h += '<h2 class="serif" style="justify-content:center;font-size:18px;">ご予約希望を受け付けました</h2>';
     h += '<div class="summary-line"><span class="label">お名前</span><span>'+escapeHtml(state.name)+' 様</span></div>';
     h += '<div class="summary-line"><span class="label">メニュー</span><span>'+svc.name+'</span></div>';
-    h += '<div class="summary-line"><span class="label">日時</span><span>'+formatDateJP(state.date)+' '+minToLabel(state.time)+'</span></div>';
-    h += '<div class="summary-line"><span class="label">担当</span><span>'+state.stylist+'</span></div>';
+    h += '<div class="summary-line"><span class="label">日時</span><span>'+formatDateJP(state.date)+' '+hourLabel(state.time)+'</span></div>';
     h += '<div><span class="confirm-id mono">受付番号 '+state.lastId+'</span></div>';
-    h += '<div class="confirm-note">この時点ではまだ<strong>ご予約は確定しておりません</strong>。内容を確認のうえ、担当より折り返しご連絡し、確認が取れた時点でご予約確定となります。</div>';
+    h += '<div class="confirm-note">この時点ではまだ<strong>ご予約は確定しておりません</strong>。内容を確認のうえ折り返しご連絡し、確認が取れた時点でご予約確定となります。</div>';
     h += '<div class="nav-row" style="justify-content:center;margin-top:28px;"><button class="primary" id="newBooking">別の予約をする</button></div>';
     h += '</div>';
     return h;
@@ -598,10 +601,6 @@
           render();
         });
       });
-      var stylistSelect = document.getElementById('stylistSelect');
-      if(stylistSelect) stylistSelect.addEventListener('change', function(){
-        state.stylist = stylistSelect.value;
-      });
       var back2 = document.getElementById('back2');
       if(back2) back2.addEventListener('click', function(){ state.step=1; render(); });
       var next2 = document.getElementById('next2');
@@ -636,7 +635,6 @@
           duration: svc.duration,
           serviceId: svc.id,
           serviceName: svc.name,
-          stylist: state.stylist,
           name: state.name.trim(),
           phone: state.phone.trim(),
           note: state.note.trim(),
@@ -656,7 +654,7 @@
     if(state.step===4){
       var nb = document.getElementById('newBooking');
       if(nb) nb.addEventListener('click', function(){
-        state = { step:1, service:null, date:'', time:null, stylist:STYLISTS[0], name:'', phone:'', note:'', lastId:null, slotsLoading:false, dateBookings:[] };
+        state = { step:1, service:null, date:'', time:null, name:'', phone:'', note:'', lastId:null, slotsLoading:false, dateBookings:[] };
         render();
       });
     }
